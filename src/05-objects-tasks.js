@@ -19,8 +19,12 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  this.height = height;
+  this.width = width;
+  this.getArea = function getArea() {
+    return this.height * this.width;
+  };
 }
 
 /**
@@ -33,8 +37,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 /**
@@ -48,8 +52,9 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const obj = JSON.parse(json);
+  return Object.setPrototypeOf(obj, proto);
 }
 
 /**
@@ -106,33 +111,156 @@ function fromJSON(/* proto, json */) {
  *  For more examples see unit tests.
  */
 
+function MyCssSelectorBuilder() {
+  this.str = '';
+  this.hasElement = false;
+  this.stringify = function () {
+    const result = this.str;
+    this.str = '';
+    return result;
+  };
+
+  this.element = function (value) {
+    if (this.hasElement) {
+      let e = 'Element, id and pseudo-element should';
+      e += ' not occur more then one time inside the selector';
+      throw new Error(e);
+    }
+    if (this.str) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    this.hasElement = true;
+    this.str += value;
+    return this;
+  };
+
+  this.id = function (value) {
+    if (this.str.includes('#')) {
+      let e = 'Element, id and pseudo-element should';
+      e += ' not occur more then one time inside the selector';
+      throw new Error(e);
+    }
+    if (this.str.includes('.')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    if (this.str.includes('[')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    if (this.str.includes(':')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    if (this.str.includes('::')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    this.str += `#${value}`;
+    return this;
+  };
+
+  this.class = function (value) {
+    if (this.str.includes('[')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    if (this.str.includes(':')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    if (this.str.includes('::')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    this.str += `.${value}`;
+    return this;
+  };
+
+  this.attr = function (value) {
+    if (this.str.includes(':') || this.str.includes('::')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    this.str += `[${value}]`;
+    return this;
+  };
+
+  this.pseudoClass = function (value) {
+    if (this.str.includes('::')) {
+      let e = 'Selector parts should be arranged in the following order: ';
+      e += 'element, id, class, attribute, pseudo-class, pseudo-element';
+      throw new Error(e);
+    }
+    this.str += `:${value}`;
+    return this;
+  };
+
+  this.pseudoElement = function (value) {
+    if (this.str.includes('::')) {
+      let e = 'Element, id and pseudo-element should';
+      e += ' not occur more then one time inside the selector';
+      throw new Error(e);
+    }
+    this.str += `::${value}`;
+    return this;
+  };
+
+  this.combine = function (selector1, combinator, selector2) {
+    const a = selector1.stringify();
+    const b = selector2.stringify();
+    this.str += `${a} ${combinator} ${b}`;
+    return this;
+  };
+}
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  str: '',
+  stringify() {
+    const result = this.str;
+    this.str = '';
+    return result;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return new MyCssSelectorBuilder().element(value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new MyCssSelectorBuilder().id(value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new MyCssSelectorBuilder().class(value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new MyCssSelectorBuilder().attr(value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new MyCssSelectorBuilder().pseudoClass(value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new MyCssSelectorBuilder().pseudoElement(value);
+  },
+
+  combine(selector1, combinator, selector2) {
+    const a = selector1.stringify();
+    const b = selector2.stringify();
+    this.str += `${a} ${combinator} ${b}`;
+    return this;
   },
 };
 
