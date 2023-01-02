@@ -114,13 +114,13 @@ function fromJSON(proto, json) {
 function MyCssSelectorBuilder() {
   this.str = '';
   this.hasElement = false;
-  this.stringify = function () {
+  this.stringify = function stringify() {
     const result = this.str;
     this.str = '';
     return result;
   };
 
-  this.element = function (value) {
+  this.element = function element(value) {
     if (this.hasElement) {
       let e = 'Element, id and pseudo-element should';
       e += ' not occur more then one time inside the selector';
@@ -136,7 +136,7 @@ function MyCssSelectorBuilder() {
     return this;
   };
 
-  this.id = function (value) {
+  this.id = function id(value) {
     if (this.str.includes('#')) {
       let e = 'Element, id and pseudo-element should';
       e += ' not occur more then one time inside the selector';
@@ -166,7 +166,7 @@ function MyCssSelectorBuilder() {
     return this;
   };
 
-  this.class = function (value) {
+  this.class = function classfn(value) {
     if (this.str.includes('[')) {
       let e = 'Selector parts should be arranged in the following order: ';
       e += 'element, id, class, attribute, pseudo-class, pseudo-element';
@@ -186,7 +186,7 @@ function MyCssSelectorBuilder() {
     return this;
   };
 
-  this.attr = function (value) {
+  this.attr = function attr(value) {
     if (this.str.includes(':') || this.str.includes('::')) {
       let e = 'Selector parts should be arranged in the following order: ';
       e += 'element, id, class, attribute, pseudo-class, pseudo-element';
@@ -196,7 +196,7 @@ function MyCssSelectorBuilder() {
     return this;
   };
 
-  this.pseudoClass = function (value) {
+  this.pseudoClass = function pseudoClass(value) {
     if (this.str.includes('::')) {
       let e = 'Selector parts should be arranged in the following order: ';
       e += 'element, id, class, attribute, pseudo-class, pseudo-element';
@@ -206,20 +206,13 @@ function MyCssSelectorBuilder() {
     return this;
   };
 
-  this.pseudoElement = function (value) {
+  this.pseudoElement = function pseudoElement(value) {
     if (this.str.includes('::')) {
       let e = 'Element, id and pseudo-element should';
       e += ' not occur more then one time inside the selector';
       throw new Error(e);
     }
     this.str += `::${value}`;
-    return this;
-  };
-
-  this.combine = function (selector1, combinator, selector2) {
-    const a = selector1.stringify();
-    const b = selector2.stringify();
-    this.str += `${a} ${combinator} ${b}`;
     return this;
   };
 }
